@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>अर्थ — Manage अर्थ to create अर्थ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Tiro+Devanagari+Hindi&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12172B;
+    --ink-soft:#2B3350;
+    --paper:#F3EFE6;
+    --paper-raised:#FFFDF8;
+    --gold:#C99A2E;
+    --gold-bright:#E3B23C;
+    --teal:#0F6D66;
+    --maroon:#8C2F39;
+    --line:#DDD5C3;
+    --text:#1B2033;
+    --text-muted:#5B6178;
+    --radius:14px;
+    --shadow: 0 6px 24px rgba(18,23,43,0.08);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .dev{font-family:'Tiro Devanagari Hindi',serif;}
+  h1,h2,h3{font-family:'Fraunces',serif; margin:0; color:var(--ink);}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer;}
+  :focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+
+  /* ---------- shell ---------- */
+  #app{min-height:100vh; display:flex; flex-direction:column;}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; border-bottom:1px solid var(--line);
+    background:var(--paper);
+  }
+  .brand{display:flex; align-items:baseline; gap:8px;}
+  .brand .glyph{font-size:24px; color:var(--gold); font-family:'Tiro Devanagari Hindi',serif;}
+  .brand .word{font-family:'Fraunces',serif; font-weight:600; font-size:18px; letter-spacing:0.02em;}
+  .team-link{
+    font-size:12px; color:var(--text-muted); text-decoration:none;
+    border:1px solid var(--line); padding:6px 12px; border-radius:999px;
+    background:var(--paper-raised);
+  }
+  .team-link:hover{color:var(--ink); border-color:var(--gold);}
+
+  main{flex:1; display:flex; flex-direction:column;}
+  .screen{display:none; animation:fadeUp .45s ease;}
+  .screen.active{display:block;}
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .compliance-bar{
+    font-size:12px; color:var(--text-muted); text-align:center;
+    padding:10px 20px; border-top:1px solid var(--line);
+    background:var(--paper-raised);
+  }
+  .compliance-bar strong{color:var(--ink-soft);}
+
+  /* ---------- step tracker (the ledger line) ---------- */
+  .tracker{
+    max-width:720px; margin:0 auto; padding:28px 24px 4px;
+  }
+  .tracker-line{
+    position:relative; height:2px; background:var(--line); border-radius:2px;
+    margin:0 8px 10px;
+  }
+  .tracker-fill{
+    position:absolute; left:0; top:0; height:100%; background:var(--gold);
+    border-radius:2px; transition:width .5s ease;
+  }
+  .tracker-steps{display:flex; justify-content:space-between; padding:0;}
+  .tracker-step{
+    font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--text-muted); font-family:'IBM Plex Mono',monospace;
+    display:flex; flex-direction:column; align-items:center; gap:6px; flex:1;
+  }
+  .tracker-step .dot{width:9px; height:9px; border-radius:50%; background:var(--line); border:2px solid var(--paper);}
+  .tracker-step.done .dot{background:var(--gold);}
+  .tracker-step.now .dot{background:var(--teal); box-shadow:0 0 0 4px rgba(15,109,102,0.15);}
+  .tracker-step.now{color:var(--ink);}
+
+  /* ---------- landing ---------- */
+  .hero{
+    background:var(--ink); color:var(--paper);
+    padding:64px 24px 56px; position:relative; overflow:hidden;
+  }
+  .hero-inner{max-width:760px; margin:0 auto; position:relative; z-index:2;}
+  .kicker{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold-bright); margin-bottom:18px;
+  }
+  .lexicon{
+    background:rgba(255,253,248,0.05); border:1px solid rgba(227,178,60,0.3);
+    border-radius:var(--radius); padding:26px 28px; margin-bottom:28px;
+  }
+  .lexicon .headword{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;}
+  .lexicon .headword .dev{font-size:40px; color:var(--gold-bright);}
+  .lexicon .headword .roman{font-family:'Fraunces',serif; font-style:italic; font-size:20px; color:#C9CADA;}
+  .lexicon .pos{font-family:'IBM Plex Mono',monospace; font-size:12px; color:#9BA0BE; margin-left:2px;}
+  .lexicon ol{margin:12px 0 0; padding-left:20px; color:#DCDCE8; font-size:15px; line-height:1.6;}
+  .lexicon ol li::marker{color:var(--gold-bright); font-family:'IBM Plex Mono',monospace;}
+
+  .hero h1{color:#FDFBF6; font-size:clamp(30px,5vw,44px); line-height:1.15; font-weight:600; margin-bottom:14px;}
+  .hero h1 .dev{color:var(--gold-bright);}
+  .hero p.sub{color:#C9CADA; font-size:17px; max-width:520px; line-height:1.6; margin-bottom:30px;}
+  .cta-primary{
+    background:var(--gold); color:var(--ink); border:none;
+    padding:15px 30px; font-size:15px; font-weight:600; border-radius:999px;
+    box-shadow:0 8px 20px rgba(201,154,46,0.35);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .cta-primary:hover{background:var(--gold-bright); transform:translateY(-1px);}
+  .cta-time{font-family:'IBM Plex Mono',monospace; font-size:12px; color:#9BA0BE; margin-top:12px;}
+
+  .sparkline{position:absolute; right:-40px; bottom:-20px; width:420px; height:260px; opacity:0.5; z-index:1;}
+
+  .trust-row{
+    max-width:760px; margin:0 auto; display:flex; gap:14px; flex-wrap:wrap;
+    padding:34px 24px 0;
+  }
+  .trust-badge{
+    display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-muted);
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:999px;
+    padding:8px 14px;
+  }
+  .trust-badge .ic{color:var(--teal); font-family:'IBM Plex Mono',monospace; font-weight:600;}
+
+  .landing-below{max-width:760px; margin:0 auto; padding:44px 24px 60px;}
+  .flow-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-top:18px;}
+  .flow-card{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:12px;
+    padding:16px; font-size:13px; color:var(--text-muted);
+  }
+  .flow-card b{display:block; color:var(--ink); font-family:'Fraunces',serif; font-size:15px; margin-bottom:4px;}
+
+  /* ---------- generic form screens ---------- */
+  .stage{max-width:640px; margin:0 auto; padding:20px 24px 60px; width:100%;}
+  .stage h2{font-size:26px; margin-bottom:6px;}
+  .stage .lede{color:var(--text-muted); font-size:14px; margin-bottom:28px; line-height:1.5;}
+  .field{margin-bottom:20px;}
+  .field label{display:block; font-size:13px; font-weight:600; color:var(--ink-soft); margin-bottom:7px;}
+  .field .hint{font-size:12px; color:var(--text-muted); font-weight:400; margin-left:6px;}
+  .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=number], .field select, .field textarea{
+    width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:10px;
+    background:var(--paper-raised); font-family:'Inter',sans-serif; font-size:14px; color:var(--text);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--teal);}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:520px){.row2{grid-template-columns:1fr;}}
+
+  .chip-group{display:flex; flex-wrap:wrap; gap:10px;}
+  .chip{
+    display:inline-flex; align-items:center;
+    border:1px solid var(--line); background:var(--paper-raised); border-radius:999px;
+    padding:9px 16px; font-size:13px; color:var(--text); user-select:none;
+    cursor:pointer;
+  }
+  .chip input{position:absolute; opacity:0; width:0; height:0; pointer-events:none;}
+  .chip.checked{border-color:var(--gold); background:rgba(201,154,46,0.12); color:var(--ink); font-weight:600;}
+
+  .option-card{
+    display:block; border:1px solid var(--line); background:var(--paper-raised);
+    border-radius:12px; padding:14px 16px; margin-bottom:10px; cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .option-card input{display:none;}
+  .option-card .opt-title{font-weight:600; font-size:14px; color:var(--ink);}
+  .option-card .opt-desc{font-size:12px; color:var(--text-muted); margin-top:3px;}
+  .option-card.checked{border-color:var(--teal); background:rgba(15,109,102,0.07);}
+  .option-card.checked .opt-title{color:var(--teal);}
+
+  .qblock{margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--line);}
+  .qblock:last-child{border-bottom:none;}
+  .qblock .qtitle{font-size:14px; font-weight:600; color:var(--ink); margin-bottom:12px;}
+  .qnum{font-family:'IBM Plex Mono',monospace; color:var(--gold); margin-right:6px;}
+
+  .range-wrap{display:flex; align-items:center; gap:14px;}
+  .range-wrap input[type=range]{flex:1; accent-color:var(--teal);}
+  .range-val{font-family:'IBM Plex Mono',monospace; font-size:14px; min-width:64px; text-align:right; color:var(--ink);}
+
+  .nav-btns{display:flex; justify-content:space-between; margin-top:32px; align-items:center;}
+  .btn{
+    border:none; border-radius:999px; padding:13px 26px; font-size:14px; font-weight:600;
+    transition:transform .15s ease, opacity .15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--ink); color:var(--paper);}
+  .btn-primary:disabled{opacity:.4; cursor:not-allowed; transform:none;}
+  .btn-ghost{background:transparent; color:var(--text-muted); padding:13px 8px;}
+  .btn-ghost:hover{color:var(--ink);}
+  .error-msg{color:var(--maroon); font-size:12px; margin-top:6px; display:none;}
+
+  /* ---------- processing ---------- */
+  .processing{
+    max-width:480px; margin:80px auto; text-align:center; padding:0 24px;
+  }
+  .loader{
+    width:56px; height:56px; margin:0 auto 26px; border-radius:50%;
+    border:3px solid var(--line); border-top-color:var(--gold);
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .processing p{color:var(--text-muted); font-size:14px;}
+
+  /* ---------- results ---------- */
+  .results-grid{display:grid; grid-template-columns:1.1fr 1fr; gap:36px; align-items:start;}
+  @media(max-width:720px){.results-grid{grid-template-columns:1fr;}}
+  .donut-wrap{display:flex; flex-direction:column; align-items:center; gap:18px; padding:20px 0;}
+  .donut{
+    width:220px; height:220px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .donut-hole{
+    width:132px; height:132px; border-radius:50%; background:var(--paper);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .donut-hole .pct{font-family:'IBM Plex Mono',monospace; font-size:26px; font-weight:600; color:var(--ink);}
+  .donut-hole .lbl{font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);}
+  .legend{width:100%; max-width:280px;}
+  .legend-row{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px;}
+  .legend-row:last-child{border-bottom:none;}
+  .swatch{width:11px; height:11px; border-radius:3px; flex-shrink:0;}
+  .legend-row .cat{flex:1; color:var(--ink-soft); font-weight:500;}
+  .legend-row .val{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink);}
+  .legend-row .examples{width:100%; font-size:11.5px; color:var(--text-muted); margin-top:2px;}
+
+  .why-card{background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius); padding:22px; margin-bottom:18px;}
+  .why-card h3{font-size:15px; margin-bottom:10px;}
+  .why-card p{font-size:13.5px; line-height:1.65; color:var(--text-muted); margin:0;}
+  .why-card p + p{margin-top:10px;}
+  .stat-pill{display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; background:rgba(15,109,102,0.09); color:var(--teal); border-radius:999px; padding:4px 10px; margin:2px 4px 2px 0;}
+
+  .disclaimer-card{
+    border:1px solid rgba(140,47,57,0.35); background:rgba(140,47,57,0.05);
+    border-radius:var(--radius); padding:18px 20px; margin-top:22px; font-size:12.5px; color:#5A2A30; line-height:1.6;
+  }
+  .disclaimer-card b{color:var(--maroon);}
+
+  .results-actions{display:flex; gap:12px; margin-top:26px; flex-wrap:wrap;}
+  .btn-outline{background:transparent; border:1px solid var(--ink); color:var(--ink);}
+
+  /* ---------- CFP handoff ---------- */
+  .lead-summary{background:var(--paper-raised); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin-bottom:24px; font-size:13px;}
+  .lead-summary .lsrow{display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px dashed var(--line);}
+  .lead-summary .lsrow:last-child{border-bottom:none;}
+  .lead-summary .lsrow span:first-child{color:var(--text-muted);}
+  .lead-summary .lsrow span:last-child{font-family:'IBM Plex Mono',monospace; color:var(--ink);}
+
+  .slot-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  @media(max-width:480px){.slot-grid{grid-template-columns:repeat(2,1fr);}}
+  .slot{
+    border:1px solid var(--line); border-radius:10px; background:var(--paper-raised);
+    padding:10px 6px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+  }
+  .slot input{display:none;}
+  .slot.checked{border-color:var(--teal); background:rgba(15,109,102,0.09); color:var(--teal); font-weight:600;}
+
+  .confirm-box{text-align:center; padding:40px 24px;}
+  .confirm-check{
+    width:60px; height:60px; border-radius:50%; background:var(--teal); color:#fff;
+    display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:28px;
+  }
+
+  /* ---------- CRM ---------- */
+  .crm-wrap{max-width:1080px; margin:0 auto; padding:26px 24px 60px;}
+  .crm-head{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px;}
+  .crm-search{padding:10px 14px; border:1px solid var(--line); border-radius:10px; background:var(--paper-raised); font-size:13px; min-width:220px;}
+  .crm-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--paper-raised);}
+  table.crm{width:100%; border-collapse:collapse; font-size:12.5px; min-width:920px;}
+  table.crm th{
+    text-align:left; padding:12px 14px; background:var(--ink); color:var(--paper);
+    font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:.04em;
+    position:sticky; top:0;
+  }
+  table.crm td{padding:11px 14px; border-bottom:1px solid var(--line); color:var(--text); vertical-align:middle;}
+  table.crm tr:last-child td{border-bottom:none;}
+  table.crm tr:hover td{background:rgba(201,154,46,0.06);}
+  .tag{padding:3px 9px; border-radius:999px; font-size:11px; font-weight:600; font-family:'IBM Plex Mono',monospace;}
+  .tag.cons{background:rgba(140,47,57,0.12); color:var(--maroon);}
+  .tag.mod{background:rgba(201,154,46,0.16); color:#8A6A1E;}
+  .tag.grow{background:rgba(15,109,102,0.14); color:var(--teal);}
+  .tag.aggr{background:rgba(43,51,80,0.14); color:var(--ink-soft);}
+  select.status{padding:6px 8px; border-radius:8px; border:1px solid var(--line); font-size:12px; background:#fff;}
+  .crm-note{max-width:180px; font-size:11.5px; color:var(--text-muted);}
+  .crm-back{font-size:12px; color:var(--text-muted); text-decoration:none; margin-bottom:16px; display:inline-block;}
+
+  /* ---------- cashflow pie (risk page) ---------- */
+  .cashflow-card{display:flex; gap:28px; flex-wrap:wrap; align-items:center;}
+  .cashflow-donut-wrap{display:flex; flex-direction:column; align-items:center; gap:10px;}
+  .cashflow-donut{width:150px; height:150px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .cashflow-hole{width:92px; height:92px; border-radius:50%; background:var(--paper-raised); display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .cashflow-hole .pct{font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:600; color:var(--ink);}
+  .cashflow-hole .lbl{font-size:9px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); text-align:center;}
+  .cashflow-legend{flex:1; min-width:200px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <div class="brand"><span class="glyph dev">अ</span><span class="word">Artha <span style="color:var(--text-muted); font-weight:400;">| पोर्टफोलियो प्लानर</span></span></div>
+    <a class="team-link" href="#" onclick="goCRM();return false;">CFP team login →</a>
+  </div>
+
+  <main>
+
+    <!-- ================= LANDING ================= -->
+    <section class="screen active" id="screen-landing">
+      <div class="hero">
+        <svg class="sparkline" viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="0,220 40,200 80,210 120,160 160,175 200,120 240,140 280,90 320,100 360,55 420,40"
+            fill="none" stroke="#E3B23C" stroke-width="2" opacity="0.7"/>
+          <circle cx="420" cy="40" r="4" fill="#E3B23C"/>
+        </svg>
+        <div class="hero-inner">
+          <div class="kicker">Free · 3-minute portfolio plan</div>
+          <div class="lexicon">
+            <div class="headword">
+              <span class="dev">अर्थ</span>
+              <span class="roman">artha</span>
+              <span class="pos">noun</span>
+            </div>
+            <ol>
+              <li>wealth; prosperity; material means</li>
+              <li>meaning; purpose; the reason a thing matters</li>
+            </ol>
+          </div>
+          <h1>Manage <span class="dev">अर्थ</span> to create <span class="dev">अर्थ</span>.</h1>
+          <p class="sub">Answer a few honest questions about your money and your goals. We'll turn them into a clear, rules-based asset mix — then connect you to a SEBI-registered CFP who already knows your numbers.</p>
+          <button class="cta-primary" onclick="goTo('signup')">Get your free portfolio plan</button>
+          <div class="cta-time">Takes about 3 minutes · No commitment · No product pitches</div>
+        </div>
+      </div>
+
+      <div class="trust-row">
+        <div class="trust-badge"><span class="ic">✓</span> SEBI-registered CFPs on call</div>
+        <div class="trust-badge"><span class="ic">✓</span> Bank-grade data encryption</div>
+        <div class="trust-badge"><span class="ic">✓</span> Illustrative, not sold as advice</div>
+      </div>
+
+      <div class="landing-below">
+        <h3 style="font-size:16px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; font-family:'IBM Plex Mono',monospace;">How the 3 minutes are spent</h3>
+        <div class="flow-grid">
+          <div class="flow-card"><b>01 · You</b>A few details, your income, and your comfort with risk.</div>
+          <div class="flow-card"><b>02 · The engine</b>Age, horizon and risk score combine into a rules-based split.</div>
+          <div class="flow-card"><b>03 · A CFP</b>Walks in already knowing your profile — no repeating yourself.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= APP FLOW WRAPPER (steps 1-5) ================= -->
+    <div id="flow-wrapper" style="display:none;">
+      <div class="tracker">
+        <div class="tracker-line"><div class="tracker-fill" id="trackerFill" style="width:0%"></div></div>
+        <div class="tracker-steps" id="trackerSteps"></div>
+      </div>
+
+      <!-- ---- SIGNUP / KYC ---- -->
+      <section class="screen" id="screen-signup">
+        <div class="stage">
+          <h2>Let's start with the basics</h2>
+          <p class="lede">Five quick fields — that's all. No documents, no OTP, no wait.</p>
+
+          <div class="field"><label>Full name</label>
+            <input type="text" id="k_name" placeholder="As you'd like to be addressed"></div>
+          <div class="row2">
+            <div class="field"><label>Phone number</label>
+              <input type="tel" id="k_phone" placeholder="10-digit mobile"></div>
+            <div class="field"><label>Email</label>
+              <input type="email" id="k_email" placeholder="you@example.com"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Age</label>
+              <input type="number" id="k_age" min="18" max="75" placeholder="e.g. 32"></div>
+            <div class="field"><label>City</label>
+              <input type="text" id="k_city" placeholder="e.g. Bhubaneswar"></div>
+          </div>
+          <div class="error-msg" id="err-signup">Please fill in all five fields — age between 18 and 75.</div>
+          <div class="nav-btns">
+            <button class="btn btn-ghost" onclick="goTo('landing')">← Back</button>
+            <button class="btn btn-primary" onclick="validateSignup()">Continue</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- INCOME & SAVINGS ---- -->
+      <section class="screen" id="screen-income">
+        <div class="stage">
+          <h2>Your income &amp; savings</h2>
+          <p class="lede">This shapes how much of a cushion you need before anything goes to growth.</p>
+
+          <div class="field"><label>Income source(s) <span class="hint">select all that apply</span></label>
+            <div class="chip-group" id="incomeSources">
+              <label class="chip"><input type="checkbox" value="Salary"> Salary</label>
+              <label class="chip"><input type="checkbox" value="Business"> Business</label>
+              <label class="chip"><input type="checkbox" value="Freelance"> Freelance</label>
+              <label class="chip"><input type="checkbox" value="Rental"> Rental</label>
+              <label class="chip"><input type="checkbox" value="Other"> Other</label>
+            </div>
+          </div>
+
+          <div class="field"><label>Monthly income band</label>
+            <select id="k_incomeBand">
+              <option value="">Select a range</option>
+              <option value="lt25">Under ₹25,000</option>
+              <option value="25-50">₹25,000 – ₹50,000</option>
+              <option value="50-100">₹50,000 – ₹1,00,000</option>
+              <option value="100-200">₹1,00,000 – ₹2,00,000</option>
+              <option value="200-500">₹2,00,000 – ₹5,00,000</option>
+              <option value="gt500">Above ₹5,00,000</option>
+            </select>
+          </div>
+
+          <div class="field"><label>Monthly investable surplus <span class="hint">what's left after expenses</span></label>
+            <input type="number" id="k_surplus" placeholder="Amount in ₹, e.g. 15000"></div>
+
+          <div class="field"><label>Existing investments <span class="hint">optional</span></label>
+            <div class="chip-group" id="existingInv">
+              <label class="chip"><input type="checkbox" value="Mutual Funds"> Mutual Funds</label>
+              <label class="chip"><input type="checkbox" value="Stocks"> Stocks</label>
+              <label class="chip"><input type="checkbox" value="FD/RD"> FD / RD</label>
+              <label class="chip"><input type="checkbox" value="PPF/EPF"> PPF / EPF</label>
+              <label class="chip"><input type="checkbox" value="Real Estate"> Real Estate</label>
+              <label class="chip"><input type="checkbox" value="Gold"> Gold</label>
+              <label class="chip"><input type="checkbox" value="None"> None yet</label>
+            </div>
+          </div>
+          <div class="error-msg" id="err-income">Please select at least one income source and a monthly income band.</div>
+          <div class="nav-btns">
+            <button class="btn btn-ghost" onclick="goTo('signup')">← Back</button>
+            <button class="btn btn-primary" onclick="validateIncome()">Continue</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- RISK QUESTIONNAIRE ---- -->
+      <section class="screen" id="screen-risk">
+        <div class="stage">
+          <h2>How you actually handle risk</h2>
+          <p class="lede">Self-rated "low / medium / high" is unreliable — so we score six real scenarios instead.</p>
+
+          <div class="why-card cashflow-card" id="cashflowCard">
+            <div class="cashflow-donut-wrap">
+              <div class="cashflow-donut" id="cashflowDonut">
+                <div class="cashflow-hole">
+                  <div class="pct" id="cashflowCenterPct">–%</div>
+                  <div class="lbl">of income saved</div>
+                </div>
+              </div>
+            </div>
+            <div class="cashflow-legend">
+              <h3 style="font-size:14px; margin-bottom:8px;">Your monthly money flow</h3>
+              <div class="legend" id="cashflowLegend"></div>
+              <p style="font-size:11.5px; color:var(--text-muted); margin-top:10px;" id="cashflowNote"></p>
+            </div>
+          </div>
+
+          <div id="riskQuestions"></div>
+          <div class="error-msg" id="err-risk">Please answer all six questions.</div>
+          <div class="nav-btns">
+            <button class="btn btn-ghost" onclick="goTo('income')">← Back</button>
+            <button class="btn btn-primary" onclick="validateRisk()">Continue</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- GOAL TAGGING ---- -->
+      <section class="screen" id="screen-goals">
+        <div class="stage">
+          <h2>What is this money for?</h2>
+          <p class="lede">Your goal sets the time horizon — which matters as much as your risk score.</p>
+          <div id="goalOptions"></div>
+
+          <div class="field" style="margin-top:24px;">
+            <label>Time horizon <span class="hint">we've suggested one — adjust if needed</span></label>
+            <div class="range-wrap">
+              <input type="range" id="k_horizon" min="1" max="30" value="10" oninput="updateHorizonLabel()">
+              <span class="range-val" id="horizonLabel">10 yrs</span>
+            </div>
+          </div>
+          <div class="error-msg" id="err-goals">Please select a primary goal.</div>
+          <div class="nav-btns">
+            <button class="btn btn-ghost" onclick="goTo('risk')">← Back</button>
+            <button class="btn btn-primary" onclick="validateGoals()">Get my plan</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- PROCESSING ---- -->
+      <section class="screen" id="screen-processing">
+        <div class="processing">
+          <div class="loader"></div>
+          <p id="processingText">Running your inputs through the allocation engine…</p>
+        </div>
+      </section>
+
+      <!-- ---- RESULTS ---- -->
+      <section class="screen" id="screen-results">
+        <div class="stage" style="max-width:900px;">
+          <h2 id="resultsHeadline">Your suggested asset mix</h2>
+          <p class="lede" id="resultsSub"></p>
+
+          <div class="results-grid">
+            <div class="donut-wrap">
+              <div class="donut" id="donutChart">
+                <div class="donut-hole"><div class="pct" id="donutEquity">–%</div><div class="lbl">Equity</div></div>
+              </div>
+              <div class="legend" id="legendList"></div>
+            </div>
+            <div>
+              <div class="why-card">
+                <h3>Why this mix</h3>
+                <p id="whyText"></p>
+                <div id="statPills" style="margin-top:12px;"></div>
+              </div>
+              <div class="disclaimer-card">
+                <b>Illustrative tool, not personalised investment advice.</b> This allocation is generated from a fixed set of rules based on your age, risk score, and stated horizon. It does not constitute investment advice under SEBI regulations and no product or fund is being recommended. A registered CFP will personalise this after reviewing your full financial picture.
+              </div>
+            </div>
+          </div>
+
+          <div class="results-actions">
+            <button class="btn btn-primary" onclick="goTo('cfp')">Talk to a CFP about this →</button>
+            <button class="btn btn-outline" onclick="goTo('goals')">← Adjust my answers</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- CFP HANDOFF ---- -->
+      <section class="screen" id="screen-cfp">
+        <div class="stage">
+          <h2>Book a call with a CFP</h2>
+          <p class="lede">Your profile and results go straight to them — you won't need to repeat anything.</p>
+
+          <div class="lead-summary" id="leadSummary"></div>
+
+          <div class="field"><label>Pick a slot</label>
+            <div class="slot-grid" id="slotGrid"></div>
+          </div>
+          <div class="field"><label>Anything you'd like the CFP to know? <span class="hint">optional</span></label>
+            <textarea id="k_notes" rows="3" placeholder="e.g. Prefer a call after 6pm"></textarea></div>
+
+          <div class="error-msg" id="err-cfp">Please pick a slot.</div>
+          <div class="nav-btns">
+            <button class="btn btn-ghost" onclick="goTo('results')">← Back</button>
+            <button class="btn btn-primary" onclick="submitLead()">Confirm booking</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- CONFIRMATION ---- -->
+      <section class="screen" id="screen-confirm">
+        <div class="confirm-box">
+          <div class="confirm-check">✓</div>
+          <h2>You're booked</h2>
+          <p style="color:var(--text-muted); max-width:420px; margin:12px auto 0; font-size:14px; line-height:1.6;" id="confirmText"></p>
+          <div style="margin-top:28px;">
+            <a class="team-link" href="#" onclick="goCRM();return false;">See how this looks on the CFP's side →</a>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /flow-wrapper -->
+
+    <!-- ================= CRM (INTERNAL) ================= -->
+    <section class="screen" id="screen-crm">
+      <div class="crm-wrap">
+        <a class="crm-back" href="#" onclick="goTo('landing');return false;">← Exit internal view</a>
+        <div class="crm-head">
+          <div>
+            <h2 style="font-size:22px;">CFP lead queue</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Internal view — not visible to customers.</p>
+          </div>
+          <input class="crm-search" id="crmSearch" placeholder="Search by name or city…" oninput="renderCRM()">
+        </div>
+        <div class="crm-table-wrap">
+          <table class="crm">
+            <thead><tr>
+              <th>Name</th><th>Contact</th><th>Age / City</th><th>Risk</th><th>Goal</th>
+              <th>Horizon</th><th>Equity %</th><th>Status</th><th>Notes</th>
+            </tr></thead>
+            <tbody id="crmBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="compliance-bar" id="footerCompliance">
+    <strong>Artha</strong> gives an illustrative, rules-based portfolio split. It is not personalised investment advice under SEBI regulations until a registered CFP is engaged.
+  </div>
+</div>
+
+<script>
+/* ============================ STATE ============================ */
+const state = {
+  name:'', phone:'', email:'', age:null, city:'',
+  incomeSources:[], incomeBand:'', surplus:null, existingInv:[],
+  riskAnswers:{}, riskScore:0, riskCategory:'',
+  goal:'', horizon:10,
+  allocation:null, slot:'', notes:''
+};
+
+const STEPS = ['signup','income','risk','goals','results'];
+const STEP_LABELS = {signup:'KYC', income:'Income', risk:'Risk', goals:'Goals', results:'Results'};
+
+/* ============================ NAV ============================ */
+function goTo(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const flow = document.getElementById('flow-wrapper');
+  const footer = document.getElementById('footerCompliance');
+
+  if(name==='landing'){
+    flow.style.display='none';
+    footer.style.display='none';
+    document.getElementById('screen-landing').classList.add('active');
+  } else if(name==='crm'){
+    flow.style.display='none';
+    footer.style.display='none';
+    document.getElementById('screen-crm').classList.add('active');
+    renderCRM();
+  } else {
+    flow.style.display='block';
+    footer.style.display = (STEPS.includes(name)) ? 'block' : (name==='cfp'||name==='confirm'?'block':'none');
+    document.getElementById('screen-'+name).classList.add('active');
+    updateTracker(name);
+    if(name==='risk'){ renderCashflowPie(); }
+    if(name==='processing'){ runProcessing(); }
+    if(name==='cfp'){ renderCFP(); }
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function goCRM(){ goTo('crm'); }
+
+function updateTracker(current){
+  const idx = STEPS.indexOf(current);
+  const fill = document.getElementById('trackerFill');
+  const stepsWrap = document.getElementById('trackerSteps');
+  if(idx===-1){ stepsWrap.innerHTML=''; fill.style.width='0%'; return; }
+  fill.style.width = ((idx)/(STEPS.length-1)*100)+'%';
+  stepsWrap.innerHTML = STEPS.map((s,i)=>{
+    const cls = i<idx ? 'done' : (i===idx ? 'now' : '');
+    return `<div class="tracker-step ${cls}"><span class="dot"></span>${STEP_LABELS[s]}</div>`;
+  }).join('');
+}
+
+/* ============================ CHIPS ============================ */
+/* Chips are <label class="chip"><input type=checkbox>...</label>. Listening for
+   'click' on the label double-fires (once for the real click, once for the
+   synthetic click the browser dispatches on the wrapped input, which bubbles
+   back up through the label) — that cancelled the toggle out on every click.
+   Listening for 'change' on the input itself fires exactly once per real
+   state change, and we sync the visual class off the input's actual checked
+   state so it can never drift out of sync. */
+document.querySelectorAll('.chip input').forEach(inp=>{
+  inp.addEventListener('change', ()=>{
+    inp.closest('.chip').classList.toggle('checked', inp.checked);
+  });
+});
+function collectChips(containerId){
+  return [...document.querySelectorAll('#'+containerId+' .chip input:checked')].map(i=>i.value);
+}
+
+/* ============================ SIGNUP ============================ */
+function validateSignup(){
+  state.name = document.getElementById('k_name').value.trim();
+  state.phone = document.getElementById('k_phone').value.trim();
+  state.email = document.getElementById('k_email').value.trim();
+  state.age = parseInt(document.getElementById('k_age').value,10);
+  state.city = document.getElementById('k_city').value.trim();
+  const ok = state.name && state.phone && state.email && state.city && state.age>=18 && state.age<=75;
+  document.getElementById('err-signup').style.display = ok? 'none':'block';
+  if(ok) goTo('income');
+}
+
+/* ============================ INCOME ============================ */
+function validateIncome(){
+  state.incomeSources = collectChips('incomeSources');
+  state.incomeBand = document.getElementById('k_incomeBand').value;
+  state.surplus = parseFloat(document.getElementById('k_surplus').value)||0;
+  state.existingInv = collectChips('existingInv');
+  const ok = state.incomeSources.length>0 && state.incomeBand;
+  document.getElementById('err-income').style.display = ok? 'none':'block';
+  if(ok) goTo('risk');
+}
+
+/* ============================ CASHFLOW PIE (risk page) ============================ */
+const INCOME_MID = {lt25:20000,'25-50':37500,'50-100':75000,'100-200':150000,'200-500':350000,gt500:600000};
+const CASHFLOW_META = {
+  expenditure:{label:'Expenditure', color:'#8C2F39'},
+  investment:{label:'Investment decisions', color:'#0F6D66'},
+  wealth:{label:'Wealth / cash reserve', color:'#C99A2E'},
+};
+function computeCashflow(){
+  const income = INCOME_MID[state.incomeBand] || 50000;
+  const surplus = Math.max(0, Math.min(state.surplus||0, income));
+  let savingsPct = Math.round((surplus/income)*100);
+  savingsPct = Math.max(0, Math.min(90, savingsPct));
+  let expenditurePct = 100 - savingsPct;
+
+  // If they already hold investments (beyond "None yet"), assume more of the
+  // monthly surplus is being actively invested rather than parked as cash.
+  const hasExisting = state.existingInv.length>0 && !(state.existingInv.length===1 && state.existingInv[0]==='None');
+  const investRatio = hasExisting ? 0.75 : 0.5;
+
+  let investmentPct = Math.round(savingsPct*investRatio);
+  let wealthPct = savingsPct - investmentPct;
+
+  // fix rounding drift so the three slices always sum to exactly 100
+  let total = expenditurePct+investmentPct+wealthPct;
+  expenditurePct += (100-total);
+
+  return {expenditure:expenditurePct, investment:investmentPct, wealth:wealthPct};
+}
+function renderCashflowPie(){
+  const c = computeCashflow();
+  const order = ['expenditure','investment','wealth'];
+  let acc = 0; const stops = [];
+  order.forEach(k=>{
+    const start = acc; acc += c[k];
+    stops.push(`${CASHFLOW_META[k].color} ${start}% ${acc}%`);
+  });
+  document.getElementById('cashflowDonut').style.background = `conic-gradient(${stops.join(',')})`;
+  document.getElementById('cashflowCenterPct').textContent = (c.investment+c.wealth)+'%';
+  document.getElementById('cashflowLegend').innerHTML = order.map(k=>`
+    <div class="legend-row">
+      <span class="swatch" style="background:${CASHFLOW_META[k].color}"></span>
+      <span class="cat">${CASHFLOW_META[k].label}</span>
+      <span class="val mono">${c[k]}%</span>
+    </div>`).join('');
+  const bandLabel = document.querySelector(`#k_incomeBand option[value="${state.incomeBand}"]`);
+  document.getElementById('cashflowNote').textContent =
+    `Estimated from your income band (${bandLabel ? bandLabel.textContent : 'not set'}) and a monthly surplus of ₹${(state.surplus||0).toLocaleString('en-IN')}. An illustrative split, not exact accounting.`;
+}
+
+/* ============================ RISK QUESTIONS ============================ */
+const RISK_QUESTIONS = [
+  { key:'horizon', title:"When will you first need to use this money?",
+    options:[["Within 1 year",1],["1–3 years",2],["3–7 years",3],["7+ years",4]] },
+  { key:'reaction', title:"Your portfolio drops 20% in a bad month. You:",
+    options:[["Sell everything, I can't watch it fall further",1],["Sell some to limit the damage",2],["Hold and wait it out",3],["See it as a buying opportunity",4]] },
+  { key:'experience', title:"Your investing experience so far:",
+    options:[["None — this would be my first investment",1],["Mutual funds / SIPs only",2],["Mutual funds and direct stocks",3],["Stocks, F&O, or other alternatives",4]] },
+  { key:'liquidity', title:"How soon might you need most of this money back?",
+    options:[["Within a year, for near-certain expenses",1],["In 2–3 years, fairly likely",2],["Unlikely before 5 years",3],["Not needed for 10+ years",4]] },
+  { key:'stability', title:"How stable is your income right now?",
+    options:[["Irregular / freelance, varies a lot",1],["Stable, single source",2],["Stable, with some savings buffer",3],["Very stable, with a healthy surplus",4]] },
+  { key:'objective', title:"What matters most for this specific pool of money?",
+    options:[["Protecting what I already have",1],["A bit of steady, predictable income",2],["A balance of growth and safety",3],["Maximum long-term growth",4]] },
+];
+
+function renderRiskQuestions(){
+  const wrap = document.getElementById('riskQuestions');
+  wrap.innerHTML = RISK_QUESTIONS.map((q,qi)=>`
+    <div class="qblock">
+      <div class="qtitle"><span class="qnum">Q${qi+1}</span>${q.title}</div>
+      ${q.options.map((o,oi)=>`
+        <label class="option-card" data-q="${q.key}" data-v="${o[1]}">
+          <input type="radio" name="risk_${q.key}" value="${o[1]}" onchange="onRiskAnswer('${q.key}')">
+          <div class="opt-title">${o[0]}</div>
+        </label>`).join('')}
+    </div>`).join('');
+}
+function onRiskAnswer(key){
+  document.querySelectorAll(`.option-card[data-q="${key}"]`).forEach(c=>{
+    c.classList.toggle('checked', c.querySelector('input').checked);
+  });
+  state.riskAnswers[key] = parseInt(document.querySelector(`input[name="risk_${key}"]:checked`).value,10);
+}
+function validateRisk(){
+  const ok = Object.keys(state.riskAnswers).length === RISK_QUESTIONS.length;
+  document.getElementById('err-risk').style.display = ok? 'none':'block';
+  if(ok){
+    const sum = Object.values(state.riskAnswers).reduce((a,b)=>a+b,0); // 6..24
+    state.riskScore = Math.round((sum-6)/18*100); // 0..100
+    state.riskCategory = state.riskScore<30?'Conservative': state.riskScore<60?'Moderate': state.riskScore<80?'Growth':'Aggressive';
+    goTo('goals');
+  }
+}
+
+/* ============================ GOALS ============================ */
+const GOALS = [
+  {key:'retirement', title:'Retirement', desc:'Long runway, compounding does the heavy lifting.', horizon:20},
+  {key:'house', title:"Buying a house", desc:'A fixed target date — capital protection matters more as it nears.', horizon:6},
+  {key:'education', title:"Child's education", desc:'A known future cost with a fairly fixed deadline.', horizon:12},
+  {key:'wealth', title:'General wealth creation', desc:'No fixed deadline — flexibility to ride out volatility.', horizon:15},
+  {key:'tax', title:'Tax saving', desc:'Often shorter lock-ins, lower risk tolerance for the amount.', horizon:3},
+];
+function renderGoals(){
+  const wrap = document.getElementById('goalOptions');
+  wrap.innerHTML = GOALS.map(g=>`
+    <label class="option-card" data-goal="${g.key}">
+      <input type="radio" name="goal" value="${g.key}" onchange="onGoalPick('${g.key}', ${g.horizon})">
+      <div class="opt-title">${g.title}</div>
+      <div class="opt-desc">${g.desc}</div>
+    </label>`).join('');
+}
+function onGoalPick(key, horizon){
+  document.querySelectorAll('.option-card[data-goal]').forEach(c=>{
+    c.classList.toggle('checked', c.querySelector('input').checked);
+  });
+  state.goal = key;
+  document.getElementById('k_horizon').value = horizon;
+  updateHorizonLabel();
+}
+function updateHorizonLabel(){
+  const v = document.getElementById('k_horizon').value;
+  document.getElementById('horizonLabel').textContent = v+' yrs';
+  state.horizon = parseInt(v,10);
+}
+function validateGoals(){
+  const ok = !!state.goal;
+  document.getElementById('err-goals').style.display = ok? 'none':'block';
+  if(ok) goTo('processing');
+}
+
+/* ============================ PROCESSING ============================ */
+function runProcessing(){
+  const msgs = ["Weighing your risk score against your horizon…","Balancing growth against your goal…","Finalising your suggested mix…"];
+  let i=0;
+  document.getElementById('processingText').textContent = msgs[0];
+  const iv = setInterval(()=>{
+    i++;
+    if(i<msgs.length){ document.getElementById('processingText').textContent = msgs[i]; }
+  }, 500);
+  setTimeout(()=>{
+    clearInterval(iv);
+    state.allocation = computeAllocation(state.age, state.riskScore, state.horizon, state.goal);
+    renderResults();
+    goTo('results');
+  }, 1700);
+}
+
+/* ============================ ALLOCATION ENGINE ============================ */
+function computeAllocation(age, riskScore, horizonYears, goal){
+  age = age||30; riskScore = riskScore||50; horizonYears = horizonYears||10;
+
+  // 1. age-based base equity (classic 100-minus-age rule), clamped
+  let equity = Math.max(15, Math.min(85, 100-age));
+
+  // 2. scale by risk score: low risk score pulls it down, high pushes it up
+  equity = equity * (0.6 + (riskScore/100)*0.6); // multiplier range ~0.6x - 1.2x
+
+  // 3. horizon caps — short horizons can't carry high equity regardless of risk appetite
+  if(horizonYears < 3) equity = Math.min(equity, 30);
+  else if(horizonYears < 5) equity = Math.min(equity, 50);
+  else if(horizonYears < 8) equity = Math.min(equity, 70);
+
+  equity = Math.round(Math.max(10, Math.min(85, equity)));
+
+  // 4. gold: small ballast, a bit more for lower risk appetite (diversifier, not growth engine)
+  let gold = Math.round(5 + (100-riskScore)/100*5); // 5-10
+
+  // 5. cash: higher for short horizons / low risk score (liquidity buffer)
+  let cash = Math.round(horizonYears<3 ? 15 : 4 + (100-riskScore)/100*8);
+  cash = Math.max(4, cash);
+
+  // 6. debt takes the remainder
+  let debt = 100 - equity - gold - cash;
+  if(debt < 5){
+    // rebalance: pull the shortfall from equity first, floor debt at 5
+    const shortfall = 5 - debt;
+    equity = Math.max(10, equity - shortfall);
+    debt = 5;
+  }
+
+  // fix rounding drift so it always sums to exactly 100
+  let total = equity+gold+cash+debt;
+  debt += (100-total);
+
+  return {equity, debt, gold, cash};
+}
+
+const CATEGORY_META = {
+  equity: {label:'Equity', color:'#0F6D66', examples:'Large-cap & flexi-cap mutual funds, index funds'},
+  debt:   {label:'Debt',   color:'#C99A2E', examples:'Short-duration debt funds, PPF, corporate bonds'},
+  gold:   {label:'Gold',   color:'#8C2F39', examples:'Gold ETFs, Sovereign Gold Bonds'},
+  cash:   {label:'Cash',   color:'#2B3350', examples:'Liquid funds, savings account, FDs'},
+};
+
+function renderResults(){
+  const a = state.allocation;
+  const goalLabel = (GOALS.find(g=>g.key===state.goal)||{}).title || state.goal;
+
+  document.getElementById('resultsHeadline').textContent = `Your suggested mix — ${state.riskCategory} profile`;
+  document.getElementById('resultsSub').textContent = `Built for ${state.name || 'you'}, age ${state.age}, targeting "${goalLabel}" over roughly ${state.horizon} years.`;
+
+  // donut via conic-gradient
+  const order = ['equity','debt','gold','cash'];
+  let acc = 0; const stops = [];
+  order.forEach(k=>{
+    const start = acc; acc += a[k];
+    stops.push(`${CATEGORY_META[k].color} ${start}% ${acc}%`);
+  });
+  document.getElementById('donutChart').style.background = `conic-gradient(${stops.join(',')})`;
+  document.getElementById('donutEquity').textContent = a.equity+'%';
+
+  document.getElementById('legendList').innerHTML = order.map(k=>`
+    <div class="legend-row">
+      <span class="swatch" style="background:${CATEGORY_META[k].color}"></span>
+      <span class="cat">${CATEGORY_META[k].label}</span>
+      <span class="val mono">${a[k]}%</span>
+    </div>
+    <div class="legend-row" style="border-bottom:1px solid var(--line); padding-top:0;">
+      <span class="examples">${CATEGORY_META[k].examples}</span>
+    </div>`).join('');
+
+  const why = `At ${state.age}, with a ${state.riskCategory.toLowerCase()} risk score of ${state.riskScore}/100 and a horizon of about ${state.horizon} years for "${goalLabel}", the engine leans ${a.equity}% into equity for growth, keeps ${a.debt}% in debt for stability, and holds ${a.gold}% in gold and ${a.cash}% in cash as ballast and liquidity.`;
+  const why2 = state.horizon<5
+    ? `Because this goal is fairly close, the mix deliberately caps equity — a market dip shouldn't derail the plan right when the money is needed.`
+    : `Because the horizon is long, the mix can absorb short-term volatility in exchange for higher expected growth over time.`;
+  document.getElementById('whyText').innerHTML = `${why}<br><br>${why2}`;
+
+  document.getElementById('statPills').innerHTML = `
+    <span class="stat-pill">Risk score ${state.riskScore}/100</span>
+    <span class="stat-pill">${state.riskCategory}</span>
+    <span class="stat-pill">${state.horizon}-yr horizon</span>
+    <span class="stat-pill">${goalLabel}</span>`;
+}
+
+/* ============================ CFP HANDOFF ============================ */
+const SLOTS = ["Tomorrow, 11:00 AM","Tomorrow, 4:00 PM","Tomorrow, 6:30 PM","Day after, 10:30 AM","Day after, 2:00 PM","Day after, 7:00 PM"];
+function renderCFP(){
+  const a = state.allocation || {equity:0,debt:0,gold:0,cash:0};
+  const goalLabel = (GOALS.find(g=>g.key===state.goal)||{}).title || state.goal;
+  document.getElementById('leadSummary').innerHTML = `
+    <div class="lsrow"><span>Name</span><span>${state.name}</span></div>
+    <div class="lsrow"><span>Contact</span><span>${state.phone} · ${state.email}</span></div>
+    <div class="lsrow"><span>Age / City</span><span>${state.age} · ${state.city}</span></div>
+    <div class="lsrow"><span>Risk profile</span><span>${state.riskCategory} (${state.riskScore}/100)</span></div>
+    <div class="lsrow"><span>Goal / Horizon</span><span>${goalLabel} · ${state.horizon} yrs</span></div>
+    <div class="lsrow"><span>Suggested mix</span><span>Eq ${a.equity} / Dt ${a.debt} / Au ${a.gold} / Cash ${a.cash}</span></div>`;
+  const grid = document.getElementById('slotGrid');
+  grid.innerHTML = SLOTS.map(s=>`
+    <label class="slot"><input type="radio" name="slot" value="${s}" onchange="onSlotPick('${s}')">${s}</label>`).join('');
+}
+function onSlotPick(s){
+  document.querySelectorAll('.slot').forEach(el=>el.classList.toggle('checked', el.querySelector('input').checked));
+  state.slot = s;
+}
+function submitLead(){
+  state.notes = document.getElementById('k_notes').value.trim();
+  const ok = !!state.slot;
+  document.getElementById('err-cfp').style.display = ok? 'none':'block';
+  if(!ok) return;
+  LEADS.push(buildLeadRecord());
+  document.getElementById('confirmText').textContent = `A CFP will call ${state.name} on ${state.slot}. Your profile and suggested mix have already been shared with them.`;
+  goTo('confirm');
+}
+function buildLeadRecord(){
+  const a = state.allocation || {equity:0,debt:0,gold:0,cash:0};
+  const goalLabel = (GOALS.find(g=>g.key===state.goal)||{}).title || state.goal;
+  return {
+    name:state.name, phone:state.phone, email:state.email, age:state.age, city:state.city,
+    risk:state.riskCategory, riskScore:state.riskScore, goal:goalLabel, horizon:state.horizon+' yrs',
+    equity:a.equity, status:'New', notes: state.notes || (state.slot? ('Booked: '+state.slot):'')
+  };
+}
+
+/* ============================ CRM (mock seeded + live leads) ============================ */
+const LEADS = [
+  {name:'Ritika Sahoo', phone:'98765 43210', email:'ritika.s@mail.com', age:29, city:'Bhubaneswar', risk:'Growth', riskScore:68, goal:'Wealth creation', horizon:'15 yrs', equity:62, status:'Contacted', notes:'Interested in SIP top-up'},
+  {name:'Amit Behera', phone:'99887 66554', email:'amit.b@mail.com', age:41, city:'Cuttack', risk:'Moderate', riskScore:47, goal:"Child's education", horizon:'10 yrs', equity:44, status:'Booked', notes:'Call after 7pm only'},
+  {name:'Sneha Patnaik', phone:'90123 45678', email:'sneha.p@mail.com', age:52, city:'Bhubaneswar', risk:'Conservative', riskScore:22, goal:'Retirement', horizon:'8 yrs', equity:25, status:'New', notes:''},
+  {name:'Rahul Nayak', phone:'91234 56780', email:'rahul.n@mail.com', age:34, city:'Puri', risk:'Aggressive', riskScore:86, goal:'Buying a house', horizon:'5 yrs', equity:48, status:'Converted', notes:'Signed up for advisory'},
+];
+function riskTagClass(r){
+  return r==='Conservative'?'cons': r==='Moderate'?'mod': r==='Growth'?'grow':'aggr';
+}
+function renderCRM(){
+  const q = (document.getElementById('crmSearch').value||'').toLowerCase();
+  const all = [...LEADS].reverse().filter(l => !q || l.name.toLowerCase().includes(q) || l.city.toLowerCase().includes(q));
+  document.getElementById('crmBody').innerHTML = all.map((l,i)=>`
+    <tr>
+      <td><strong>${l.name}</strong></td>
+      <td>${l.phone}<br><span style="color:var(--text-muted)">${l.email}</span></td>
+      <td>${l.age} · ${l.city}</td>
+      <td><span class="tag ${riskTagClass(l.risk)}">${l.risk}</span></td>
+      <td>${l.goal}</td>
+      <td>${l.horizon}</td>
+      <td class="mono">${l.equity}%</td>
+      <td>
+        <select class="status" onchange="l_setStatus(${LEADS.indexOf(l)}, this.value)">
+          ${['New','Contacted','Booked','Converted','Not interested'].map(s=>`<option ${s===l.status?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td class="crm-note">${l.notes||'—'}</td>
+    </tr>`).join('') || `<tr><td colspan="9" style="text-align:center; color:var(--text-muted); padding:26px;">No leads match that search.</td></tr>`;
+}
+function l_setStatus(idx, val){ LEADS[idx].status = val; }
+
+/* ============================ INIT ============================ */
+renderRiskQuestions();
+renderGoals();
+</script>
+</body>
+</html>
