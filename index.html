@@ -483,6 +483,11 @@
           <p class="lede">Your goal sets the time horizon — which matters as much as your risk score.</p>
           <div id="goalOptions"></div>
 
+          <div class="field" id="goalOtherField" style="display:none;">
+            <label>Briefly, what's this goal?</label>
+            <input type="text" id="k_goalOther" placeholder="e.g. Wedding, starting a business, world trip">
+          </div>
+
           <div class="field" style="margin-top:24px;">
             <label>Time horizon <span class="hint">we've suggested one — adjust if needed</span></label>
             <div class="range-wrap">
@@ -610,7 +615,7 @@ const state = {
   name:'', phone:'', email:'', age:null, city:'',
   incomeSources:[], incomeBand:'', surplus:null, existingInv:[],
   riskAnswers:{}, riskScore:0, riskCategory:'',
-  goal:'', horizon:10,
+  goal:'', goalOther:'', horizon:10,
   allocation:null, slot:'', notes:''
 };
 
@@ -798,6 +803,7 @@ const GOALS = [
   {key:'education', title:"Child's education", desc:'A known future cost with a fairly fixed deadline.', horizon:12},
   {key:'wealth', title:'General wealth creation', desc:'No fixed deadline — flexibility to ride out volatility.', horizon:15},
   {key:'tax', title:'Tax saving', desc:'Often shorter lock-ins, lower risk tolerance for the amount.', horizon:3},
+  {key:'other', title:'Other', desc:"Something else — tell us a bit about it and we'll set a sensible default horizon.", horizon:10},
 ];
 function renderGoals(){
   const wrap = document.getElementById('goalOptions');
@@ -813,6 +819,7 @@ function onGoalPick(key, horizon){
     c.classList.toggle('checked', c.querySelector('input').checked);
   });
   state.goal = key;
+  document.getElementById('goalOtherField').style.display = (key==='other') ? 'block' : 'none';
   document.getElementById('k_horizon').value = horizon;
   updateHorizonLabel();
 }
@@ -821,7 +828,14 @@ function updateHorizonLabel(){
   document.getElementById('horizonLabel').textContent = v+' yrs';
   state.horizon = parseInt(v,10);
 }
+function getGoalLabel(){
+  if(state.goal==='other'){
+    return state.goalOther ? state.goalOther : 'Other';
+  }
+  return (GOALS.find(g=>g.key===state.goal)||{}).title || state.goal;
+}
 function validateGoals(){
+  state.goalOther = document.getElementById('k_goalOther').value.trim();
   const ok = !!state.goal;
   document.getElementById('err-goals').style.display = ok? 'none':'block';
   if(ok) goTo('processing');
@@ -893,7 +907,7 @@ const CATEGORY_META = {
 
 function renderResults(){
   const a = state.allocation;
-  const goalLabel = (GOALS.find(g=>g.key===state.goal)||{}).title || state.goal;
+  const goalLabel = getGoalLabel();
 
   document.getElementById('resultsHeadline').textContent = `Your suggested mix — ${state.riskCategory} profile`;
   document.getElementById('resultsSub').textContent = `Built for ${state.name || 'you'}, age ${state.age}, targeting "${goalLabel}" over roughly ${state.horizon} years.`;
@@ -935,7 +949,7 @@ function renderResults(){
 const SLOTS = ["Tomorrow, 11:00 AM","Tomorrow, 4:00 PM","Tomorrow, 6:30 PM","Day after, 10:30 AM","Day after, 2:00 PM","Day after, 7:00 PM"];
 function renderCFP(){
   const a = state.allocation || {equity:0,debt:0,gold:0,cash:0};
-  const goalLabel = (GOALS.find(g=>g.key===state.goal)||{}).title || state.goal;
+  const goalLabel = getGoalLabel();
   document.getElementById('leadSummary').innerHTML = `
     <div class="lsrow"><span>Name</span><span>${state.name}</span></div>
     <div class="lsrow"><span>Contact</span><span>${state.phone} · ${state.email}</span></div>
@@ -962,7 +976,7 @@ function submitLead(){
 }
 function buildLeadRecord(){
   const a = state.allocation || {equity:0,debt:0,gold:0,cash:0};
-  const goalLabel = (GOALS.find(g=>g.key===state.goal)||{}).title || state.goal;
+  const goalLabel = getGoalLabel();
   return {
     name:state.name, phone:state.phone, email:state.email, age:state.age, city:state.city,
     risk:state.riskCategory, riskScore:state.riskScore, goal:goalLabel, horizon:state.horizon+' yrs',
