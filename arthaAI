@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ArthAI | Manage अर्थ to create अर्थ</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter, Arial, sans-serif;
+}
+
+body{
+    background:#07111f;
+    color:white;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+nav{
+    display:flex;
+    justify-content:space-between;
+    padding:25px 8%;
+    align-items:center;
+    position:sticky;
+    top:0;
+    background:#07111fcc;
+    backdrop-filter:blur(12px);
+}
+
+.logo{
+    font-size:28px;
+    font-weight:800;
+    color:#6ee7b7;
+}
+
+button{
+    background:#6ee7b7;
+    border:none;
+    padding:14px 25px;
+    border-radius:30px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.3s;
+}
+
+button:hover{
+    transform:scale(1.08);
+    box-shadow:0 0 25px #6ee7b7;
+}
+
+.hero{
+    min-height:90vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:50px 10%;
+}
+
+.hero h1{
+    font-size:60px;
+}
+
+.hero span{
+    color:#6ee7b7;
+}
+
+.hero p{
+    margin:25px;
+    font-size:20px;
+    color:#cbd5e1;
+}
+
+.meaning{
+    margin-top:20px;
+    color:#94a3b8;
+}
+
+
+section{
+    padding:80px 10%;
+}
+
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
+}
+
+
+.card{
+    background:#101c32;
+    padding:30px;
+    border-radius:25px;
+    transition:.4s;
+    border:1px solid #1e293b;
+}
+
+
+.card:hover{
+    transform:translateY(-12px);
+    background:#162641;
+    box-shadow:0 20px 50px #0008;
+}
+
+
+.card h3{
+    color:#6ee7b7;
+    margin-bottom:15px;
+}
+
+
+.chat{
+    position:fixed;
+    bottom:30px;
+    right:30px;
+    background:#101c32;
+    width:300px;
+    padding:20px;
+    border-radius:25px;
+    box-shadow:0 20px 60px black;
+}
+
+
+.chat input{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border-radius:20px;
+    border:none;
+}
+
+
+.dashboard{
+    background:#0f172a;
+    border-radius:30px;
+    padding:40px;
+}
+
+
+.progress{
+    height:10px;
+    background:#334155;
+    border-radius:20px;
+}
+
+
+.fill{
+    width:70%;
+    height:100%;
+    background:#6ee7b7;
+    border-radius:20px;
+}
+
+
+footer{
+    text-align:center;
+    padding:40px;
+    color:#94a3b8;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<nav>
+
+<div class="logo">
+ArthAI
+</div>
+
+<button>
+Start Planning
+</button>
+
+</nav>
+
+
+
+<div class="hero">
+
+<div>
+
+<h1>
+Manage <span>अर्थ</span><br>
+to create <span>अर्थ</span>
+</h1>
+
+
+<p>
+AI-powered personal finance companion helping you manage wealth,
+make smarter decisions and create meaningful financial goals.
+</p>
+
+
+<div class="meaning">
+
+अर्थ = Wealth / Property → Manage your resources  
+<br>
+अर्थ = Meaning / Purpose → Create a meaningful life
+
+</div>
+
+<br>
+
+<button>
+Try ArthAI
+</button>
+
+</div>
+
+</div>
+
+
+
+
+
+<section>
+
+<h2>
+How ArthAI Works
+</h2>
+
+<br>
+
+
+<div class="cards">
+
+
+<div class="card">
+<h3>1. AI Onboarding</h3>
+
+OCR reads PAN/Aadhaar images and auto-fills details.
+A conversational AI replaces boring forms.
+</div>
+
+
+<div class="card">
+<h3>2. Income Intelligence</h3>
+
+For freelancers and entrepreneurs,
+AI estimates realistic monthly averages from irregular income.
+</div>
+
+
+
+<div class="card">
+<h3>3. Risk Understanding</h3>
+
+AI detects contradictions:
+"high risk appetite" but "cannot handle losses"
+and asks follow-up questions.
+</div>
+
+
+<div class="card">
+
+<h3>4. Goal Intelligence</h3>
+
+"Buy a house in Bhubaneswar"
+
+AI estimates realistic goal ranges automatically.
+
+</div>
+
+
+
+<div class="card">
+
+<h3>5. Transparent Allocation</h3>
+
+Rules-based allocation engine creates a clear,
+compliance-friendly financial roadmap.
+
+</div>
+
+
+
+<div class="card">
+
+<h3>6. AI Explanation</h3>
+
+Instead of confusing charts:
+
+"Your portfolio balances growth and stability because..."
+
+explained simply.
+
+</div>
+
+
+</div>
+
+</section>
+
+
+
+
+
+
+<section>
+
+
+<div class="dashboard">
+
+
+<h2>
+Your AI Financial Dashboard
+</h2>
+
+
+<br>
+
+<p>
+Goal: Home Purchase
+</p>
+
+
+<div class="progress">
+<div class="fill"></div>
+</div>
+
+
+<br>
+
+
+<p>
+AI Explanation:
+
+"Your current allocation focuses on stability because
+your emergency fund is incomplete and your goal timeline
+requires controlled risk."
+</p>
+
+
+<br>
+
+
+<button>
+Ask why not more equity?
+</button>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+<section>
+
+
+<h2>
+CFP + AI Collaboration
+</h2>
+
+<br>
+
+
+<div class="cards">
+
+
+<div class="card">
+
+<h3>
+AI Briefing Note
+</h3>
+
+Before meeting a CFP:
+
+"User has moderate risk profile.
+Emergency fund incomplete.
+Goal timeline conflicts with aggressive answers."
+
+</div>
+
+
+
+<div class="card">
+
+<h3>
+Compliance Shield
+</h3>
+
+AI scans explanations and CFP notes
+to flag language that becomes financial advice.
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<div class="chat">
+
+
+<h3>
+ArthAI Assistant 🤖
+</h3>
+
+
+<p id="reply">
+Hi! Want to know how ArthAI works?
+</p>
+
+
+<input 
+placeholder="Ask me..."
+onkeypress="
+if(event.key==='Enter'){
+document.getElementById('reply').innerHTML=
+'Upload your details, answer a few questions, and ArthAI creates your financial roadmap.';
+this.value=''
+}
+">
+
+
+</div>
+
+
+
+<footer>
+
+© 2026 ArthAI  
+<br>
+AI-powered financial clarity
+
+</footer>
+
+
+
+</body>
+</html>
